@@ -3,7 +3,9 @@ FROM ros:humble-ros-base-jammy AS cacher
 WORKDIR /ws/src
 
 COPY docker/files/humble.repos .
-RUN vcs import < humble.repos
+RUN git config --global http.proxy 'http://192.168.1.61:6080' \
+  && git config --global https.proxy 'https://192.168.1.61:6080' \
+  && vcs import < humble.repos
 
 COPY . beluga/
 
@@ -14,14 +16,18 @@ RUN mkdir -p /tmp/ws/src \
 
 FROM ros:humble-ros-base-jammy AS timem-builder
 
-RUN apt-get update \
+RUN export HTTP_PROXY=192.168.1.61:6080 && \
+    export HTTPS_PROXY=192.168.1.61:6080 && \
+    apt-get update \
   && apt-get install --no-install-recommends -y \
     git \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-RUN git clone -b develop https://github.com/NERSC/timemory.git \
+RUN git config --global http.proxy 'http://192.168.1.61:6080' \
+  && git config --global https.proxy 'https://192.168.1.61:6080' \
+  && git clone -b develop https://github.com/NERSC/timemory.git \
   && cd timemory \
   && git checkout 415650ee26f358218908983c87212b620c3a0328 \
   && cmake -B ./build \
@@ -51,10 +57,11 @@ RUN apt-get update \
     tmux \
   && rm -rf /var/lib/apt/lists/*
 
-RUN pip install \
-  evo==1.21.0 \
-  pre-commit==2.20.0 \
-  h5py==3.11.0
+RUN unset HTTP_PROXY && \
+    unset HTTPS_PROXY && \
+    pip install evo==1.21.0 \
+                pre-commit==2.20.0 \
+                h5py==3.11.0 --index-url https://mirrors.sustech.edu.cn/pypi/web/simple
 
 COPY --from=timem-builder --chown=$USER:$GROUP /opt/timemory/ /opt/timemory
 RUN cmake --build /opt/timemory/build --target install
@@ -81,7 +88,9 @@ RUN /bin/bash -c '\
   && sed -i "s/_USER_/$USER/" config.yml \
   && sed -i "s/_GROUP_/$GROUP/" config.yml'
 
-RUN cd /opt && git clone https://github.com/brendangregg/FlameGraph
+RUN cd /opt && git config --global http.proxy 'http://192.168.1.61:6080' \
+  && git config --global https.proxy 'https://192.168.1.61:6080' \
+  && git clone https://github.com/brendangregg/FlameGraph
 
 USER $USER:$GROUP
 
