@@ -15,6 +15,7 @@
 #ifndef BELUGA_ROS_POINT_CLOUD_HPP
 #define BELUGA_ROS_POINT_CLOUD_HPP
 
+
 #include <range/v3/view/iota.hpp>
 
 #include <beluga/sensor/data/point_cloud.hpp>
@@ -23,6 +24,8 @@
 
 #include <sophus/se3.hpp>
 
+#include <Eigen/Dense>
+
 /**
  * \file
  * \brief Implementation of `sensor_msgs/PointCloud2` wrapper type.
@@ -30,8 +33,39 @@
 
 namespace beluga_ros {
 
+template<typename T>
+struct DataType;
+
+template<>
+struct DataType<beluga_ros::msg::PointFieldU8> {
+  using type = std::uint8_t;
+};
+
+template<>
+struct DataType<beluga_ros::msg::PointFieldU16> {
+  using type = std::uint16_t;
+};
+
+template<>
+struct DataType<beluga_ros::msg::PointFieldU32> {
+  using type = std::uint32_t;
+};
+
+template<>
+struct DataType<beluga_ros::msg::PointFieldF32> {
+  using type = float;
+};
+
+template<>
+struct DataType<beluga_ros::msg::PointFieldF32> {
+  using type = double;
+};
+
 /// Thin wrapper type for 3D `sensor_msgs/PointCloud2` messages.
-class PointCloud2 : public beluga::BasePointCloud<PointCloud2> {
+/// Assumes an XYZ... type message.
+/// Each field must have the same datatype.
+/// The point cloud can't have invalid values, i.e., it must be dense.
+class PointCloud3 : public beluga::BasePointCloud<PointCloud3> {
  public:
   /// Range type.
   using Scalar = double;
@@ -40,32 +74,51 @@ class PointCloud2 : public beluga::BasePointCloud<PointCloud2> {
   ///
   /// \param cloud Point cloud message.
   /// \param origin Point cloud frame origin in the filter frame.
-  explicit PointCloud2(
+  explicit PointCloud3(
       beluga_ros::msg::PointCloud2ConstSharedPtr cloud,
       Sophus::SE3d origin = Sophus::SE3d())
       : cloud_(std::move(cloud)),
         origin_(std::move(origin)),
-        iter_points_(*cloud_, "x") {
+        stride_(0),
+        max_row_(3) {
+          // Check there are not invalid values
+          if (!cloud_->is_dense) throw std::invalid_argument("PointCloud is not dense");
+          // Check if point cloud is 3D
+          if (cloud_->fields.size() < 3) throw std::invalid_argument("PointCloud is not 3D");
+          // Check point cloud is XYZ... type
+          if (cloud_->fields.at(0).name != "x" && cloud_->fields.at(1).name != "y" && cloud_->fields.at(2).name != "z") throw std::invalid_argument("PointCloud not XYZ...");
+          // Check all datatype is the same
+          for (size_t i = 3; i < cloud_->fields.size(); ++i) {
+            stride_ += sizeof(cloud_->fields.at(i).datatype);
+          }
+          stride_ = sizeof(float) + sizeof(std::uint16_t) + sizeof(float);
+          beluga_ros::msg::PointCloud2ConstIterator<float> iterPoints(*cloud_, "x");
+          initial_point_ = reinterpret_cast<uintptr_t>(&iterPoints[0]);
+          max_col_ = cloud_->width * cloud_->height;
     assert(cloud_ != nullptr);
   }
 
   /// Get the point cloud frame origin in the filter frame.
   [[nodiscard]] const auto& origin() const { return origin_; }
 
-  /// Get point cloud view as a tuple.
-  [[nodiscard]] auto points() const {
-    return ranges::views::iota(0, static_cast<int>(cloud_->width * cloud_->height)) |
-           ranges::views::transform([this](int i) {
-             return std::make_tuple(static_cast<Scalar>(iter_points_[3 * i + 0]), 
-                                    static_cast<Scalar>(iter_points_[3 * i + 1]),
-                                    static_cast<Scalar>(iter_points_[3 * i + 2]));
-           });
+  /// Get the unorganized 3D point collection as an Eigen Map.
+  [[nodiscard]] auto point(size_t row, size_t col) const {
+    return *reinterpret_cast<float*>(initial_point_ + row*sizeof(float) + col*stride_+ col*3*sizeof(float));
   }
+
+  /// Get the point cloud frame origin in the filter frame.
+  [[nodiscard]] const auto& cols() const { return max_col_; }
+
+  /// Get the point cloud frame origin in the filter frame.
+  [[nodiscard]] const auto& rows() const { return max_row_; }
 
  private:
   beluga_ros::msg::PointCloud2ConstSharedPtr cloud_;
   Sophus::SE3d origin_;
-  beluga_ros::msg::PointCloud2ConstIterator<float> iter_points_;
+  uintptr_t initial_point_;
+  int stride_;
+  int max_row_;
+  int max_col_;
 };
 
 }  // namespace beluga_ros

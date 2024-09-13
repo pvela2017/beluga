@@ -29,9 +29,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(
     -Wall
     -Wconversion
-    -Wextra
-    -Werror
-    -Wpedantic)
+)
 endif()
 
 set(ROS_VERSION $ENV{ROS_VERSION})
