@@ -23,6 +23,8 @@
    ```sh
    ros2 service call /vdb_mapping/save_map std_srvs/srv/Trigger "{}" 
    ```
+4. After mapping use the script in dropbox to transform to level set narrow band:
+
 
 ## Check the map
 1. Print information on terminal:
