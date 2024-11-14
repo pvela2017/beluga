@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot name="simple_robot">
+
+  <!-- Link: Base -->
+  <link name="base_link">
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02"/>
+    </inertial>
+  </link>
+
+  <!-- Link: Velodyne -->
+  <link name="velodyne">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <!-- Joint: velodyne -->
+  <joint name="velodyne_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="velodyne"/>
+    <origin xyz="0.0584867781527745 0.00840419966766332 0.168915521980526" rpy="0.0078031 0.0015042 -0.0252884"/> 
+  </joint>
+
+</robot>
+

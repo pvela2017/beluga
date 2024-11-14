@@ -1,3 +1,0 @@
-# Extending Beluga
-
-Coming soon!
