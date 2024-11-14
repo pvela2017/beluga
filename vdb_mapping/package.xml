@@ -15,7 +15,7 @@
 
   <author email="grosse@fzi.de">Marvin Große Besselmann</author> 
 
-  <buildtool_depend>cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>eigen</depend>
   <depend>libopenvdb-dev</depend>

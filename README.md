@@ -3,10 +3,13 @@
 ## Installation 
 1. Install vdb_mapping dependencies:
    ```sh
-   apt-get install -y libeigen3-dev
-   apt-get install -y libtbb-dev
-   apt-get install -y libpcl-dev
-   apt-get install -y libilmbase-dev
+   sudo apt update
+   sudo apt-get install -y libeigen3-dev libtbb-dev libpcl-dev libilmbase-dev
+   ```
+2. Compile inside the container:
+   ```sh
+   source /opt/ros/jazzy/setup.bash
+   colcon build -DCMAKE_BUILD_TYPE=Release
    ```
 
 

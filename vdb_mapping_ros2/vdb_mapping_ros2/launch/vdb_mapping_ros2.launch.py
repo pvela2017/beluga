@@ -16,8 +16,7 @@ def generate_launch_description():
         package='vdb_mapping_ros2',
         executable='vdb_mapping_ros_node',
         name='vdb_mapping',
-        parameters = [config],
-        parameters = [{'use_sim_time': True}],
+        parameters = [config, {'use_sim_time': True}],
     )
 
     # Params from
