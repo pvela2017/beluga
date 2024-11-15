@@ -2,7 +2,7 @@
 # AUTOFIND will attempt to automatically locate the correct headers and libraries needed
 # by looking at the default most common folder for the required headers and libraries.
 # Set to 1 if you wish to use this or set to 0 to use the paths declared below
-AUTOFIND = 1
+AUTOFIND = 0
 ######################################################################################################
 # DEBUG, if set to 1, will print out some more information about the workings of the application
 # and file as it runs. If set to 0, the application will be much quieter when running
@@ -23,9 +23,9 @@ USE_EXT_GPU = 0
 ######################################################################################################
 # Set the root include path for the OpenVDB header files
 #   normally {__path__}/openvdb
-OPENVDB_INC_PATH = /usr/local/OpenVDB/include
+OPENVDB_INC_PATH = /usr/include/openvdb
 # Set the library path where the openvdb library can be found
-OPENVDB_LIB_PATH = /usr/local/OpenVDB/lib
+OPENVDB_LIB_PATH = /usr/lib/x86_64-linux-gnu/
 ######################################################################################################
 # Set the root include path for the tbb header files
 # Make sure you set the path one above the root folder as this application will look for headers
@@ -37,7 +37,7 @@ TBB_INC_PATH = /usr/local/include
 TBB_LIB_PATH = /usr/local/lib
 ######################################################################################################
 # Set the include path for the Half header files
-HALF_INC_PATH = /usr/local/include
+HALF_INC_PATH = /usr/local/include/OpenEXR
 #Set the path to where the libHalf library is located
 HALF_LIB_PATH = /usr/local/lib
 ######################################################################################################
@@ -46,7 +46,12 @@ HALF_LIB_PATH = /usr/local/lib
 # in the following fashion
 #   #include <boost/...>
 # So if your boost headers are found in /usr/local/include/boost, set the below value as /usr/local/include
-BOOST_INC_DIR = /usr/local/include
+BOOST_INC_DIR = /usr/include/boost
+######################################################################################################
+# Set the include path for the libImath header files
+IMATH_INC_PATH = /usr/include/Imath/
+#Set the path to where the libHalf library is located
+IMATH_LIB_PATH = /lib/x86_64-linux-gnu/
 ######################################################################################################
 
 TARGET=OpenVDBViewer
@@ -87,7 +92,7 @@ INCLUDEPATH +=. include include/coregl ui
 
 # set include paths dependant on the values set at the top of this .pro
 isEqual(AUTOFIND, 0){
-    INCLUDEPATH += $$OPENVDB_INC_PATH $$TBB_INC_PATH $$HALF_INC_PATH $$BOOST_INC_DIR
+    INCLUDEPATH += $$OPENVDB_INC_PATH $$TBB_INC_PATH $$HALF_INC_PATH $$BOOST_INC_DIR $$IMATH_INC_PATH
 }
 isEqual(AUTOFIND,1){
     unix:!macx{
@@ -134,10 +139,11 @@ isEqual(AUTOFIND,0){
     LIBS += -L$$OPENVDB_LIB_PATH -lopenvdb
     LIBS += -L$$HALF_LIB_PATH -lHalf
     LIBS += -L$$TBB_LIB_PATH -ltbb
+    LIBS += -L$$IMATH_LIB_PATH -lImath
 }
 isEqual(AUTOFIND,1){
     unix:!macx{
-        LIBS += -L/usr/local/lib -lopenvdb -ltbb -lHalf
+        LIBS += -L/usr/local/lib -lImath -lopenvdb -ltbb -lHalf
     }
     macx:{
         LIBS += -L/usr/local/lib -lopenvdb

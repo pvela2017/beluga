@@ -2,10 +2,10 @@ services:
   dev:
     build:
       context: ..
-      dockerfile: docker/images/${ROSDISTRO:-humble}/Dockerfile
-    image: ekumenlabs/beluga-${ROSDISTRO:-humble}-dev
-    hostname: beluga-${ROSDISTRO:-humble}-dev
-    container_name: beluga-${ROSDISTRO:-humble}-dev
+      dockerfile: docker/images/${ROSDISTRO:-jazzy}/Dockerfile
+    image: ekumenlabs/beluga-${ROSDISTRO:-jazzy}-dev
+    hostname: beluga-${ROSDISTRO:-jazzy}-dev
+    container_name: beluga-${ROSDISTRO:-jazzy}-dev
     environment:
       - DISPLAY
       - QT_X11_NO_MITSHM=1
