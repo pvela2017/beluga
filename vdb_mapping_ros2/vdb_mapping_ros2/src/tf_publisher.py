@@ -38,6 +38,8 @@ class PoseRepublisher(Node):
         self.publisher_.publish(new_msg)
 
         # Create and publish the TransformStamped based on the PoseStamped
+        # From
+        # https://github.com/robot-pesg/BotanicGarden/blob/01d55a9149190e0817c615d61aa0dbb0ff409010/calib/extrinsics/calib_chain.yaml#L151
         transform = TransformStamped()
         transform.header.stamp = new_msg.header.stamp
         transform.header.frame_id = new_msg.header.frame_id
