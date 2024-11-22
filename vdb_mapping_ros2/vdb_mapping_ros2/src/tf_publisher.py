@@ -44,9 +44,9 @@ class PoseRepublisher(Node):
         transform.header.stamp = new_msg.header.stamp
         transform.header.frame_id = new_msg.header.frame_id
         transform.child_frame_id = 'base_link'
-        transform.transform.translation.x = new_msg.pose.position.x + 0.02725
-        transform.transform.translation.y = new_msg.pose.position.y - 0.0047
-        transform.transform.translation.z = new_msg.pose.position.z + 0.99466
+        transform.transform.translation.x = new_msg.pose.position.x #+ 0.02725
+        transform.transform.translation.y = new_msg.pose.position.y #- 0.0047
+        transform.transform.translation.z = new_msg.pose.position.z #+ 0.99466
         transform.transform.rotation = new_msg.pose.orientation
 
         # Broadcast the transform

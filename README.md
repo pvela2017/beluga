@@ -32,9 +32,25 @@
 </br>
 **tf_publisher_odom -> My datasets**
 
+
+## VDBMapping/PCL to Narrow level set
+1. Compile the program:
+   ```sh
+   cd vdb_mapping_to_levelset/build && \
+   cmake ..
+   make
+   ```
+2. In build folder :
+   ```sh
+   ./narrowband
+   ```
+
+
 ## Check the map
 1. Print information on terminal:
    ```sh
+   sudo apt update && \
+   sudo apt install -y libopenvdb-tools
    vdb_print -l pcdgrid.vdb
    ```
 2. Use openVDB Viewer :
