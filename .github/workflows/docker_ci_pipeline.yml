@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-image:
-    if: github.repository == 'Ekumen-OS/beluga'
+    if: github.repository == 'pvela2017/beluga'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
