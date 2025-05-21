@@ -13,8 +13,10 @@
 // limitations under the License.
 
 #include <OgreEntity.h>
+#include <OgreManualObject.h>
 #include <OgreSceneManager.h>
 #include <OgreSceneNode.h>
+#include <OgreStaticGeometry.h>
 
 #include <openvdb/Grid.h>
 #include <openvdb/io/File.h>
@@ -38,7 +40,7 @@ VdbMapDisplay::VdbMapDisplay() {
   alpha_property_->setMax(1.0f);
 
   map_path_property_ = new rviz_common::properties::StringProperty(
-      "Path", "/ws/src/beluga/beluga_rviz_plugins/test/bunny.vdb", "Path of the VDB file", this);
+      "Path", "/ws/src/beluga/beluga_rviz_plugins/test/map_1005_07.vdb", "Path of the VDB file", this);
 }
 
 VdbMapDisplay::~VdbMapDisplay() {}
@@ -79,16 +81,34 @@ void VdbMapDisplay::loadMap() {
   voxel_color_->setDiffuse(color.redF(), color.greenF(), color.blueF(), alpha);
   voxel_color_->setAmbient(color.redF() * 0.5, color.greenF() * 0.5, color.blueF() * 0.5);
 
+  // Ogre::ColourValue color = rviz_common::properties::qtToOgre(color_property_->getColor());
+  // color.a = alpha_property_->getFloat();
+  // rviz_rendering::MaterialManager::enableAlphaBlending(voxel_color_, color.a);
+
+  Ogre::ManualObject* man = context_->getSceneManager()->createManualObject("test");
+  man->begin("Examples/OgreLogo", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+
   // Iterate through active voxels
   for (openvdb::FloatGrid::ValueOnCIter iter = grid->cbeginValueOn(); iter; ++iter) {
     const openvdb::Coord& coord = iter.getCoord();
     const openvdb::Vec3d world_pos = grid->indexToWorld(coord);
+    cubeCreator(man, Ogre::Vector3(world_pos.x(), world_pos.y(), world_pos.z()), 0.07f);
+  }
 
-    Ogre::Entity* entity = context_->getSceneManager()->createEntity(Ogre::SceneManager::PT_CUBE);
-    Ogre::SceneNode* scene_node = context_->getSceneManager()->getRootSceneNode()->createChildSceneNode(
-        Ogre::Vector3(world_pos.x(), world_pos.y(), world_pos.z()));
-    scene_node->setScale(0.001, 0.001, 0.001);
-    scene_node->attachObject(entity);
+  man->end();
+  context_->getSceneManager()->getRootSceneNode()->createChildSceneNode()->attachObject(man);
+}
+
+void VdbMapDisplay::cubeCreator(Ogre::ManualObject* man, const Ogre::Vector3& position, const float& resolution) {
+  const float half_size = resolution / 2.0f;
+  for (int i = 0; i < 8; ++i) {
+    // Determine sign for x, y, z using bitwise operations
+    float x = position.x + ((i & 1) ? half_size : -half_size);
+    float y = position.y + ((i & 2) ? half_size : -half_size);
+    float z = position.z + ((i & 4) ? half_size : -half_size);
+
+    man->position(x, y, z);
+    man->normal(0, 0, 1);
   }
 }
 

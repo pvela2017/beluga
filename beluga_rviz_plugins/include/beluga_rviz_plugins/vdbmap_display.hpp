@@ -48,6 +48,7 @@ class VdbMapDisplay : public rviz_common::Display {
 
  private:
   void loadMap();
+  void cubeCreator(Ogre::ManualObject* man, const Ogre::Vector3& position, const float& resolution);
 };
 
 }  // namespace beluga_rviz_plugins
