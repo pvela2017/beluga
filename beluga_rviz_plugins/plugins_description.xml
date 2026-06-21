@@ -1,0 +1,14 @@
+<library path="beluga_rviz_plugins">
+
+  <class
+    name="beluga_rviz_plugins/VdbMapDisplay"
+    type="beluga_rviz_plugins::VdbMapDisplay"
+    base_class_type="rviz_common::Display"
+  >
+    <description>
+      Displays an OpenVDB voxel grid.
+    </description>
+  </class>
+
+
+</library>
